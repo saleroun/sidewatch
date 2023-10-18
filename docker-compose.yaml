@@ -1,0 +1,9 @@
+version: '3'
+services:
+  app:
+    image: sidewatch:latest
+    ports:
+      - "9100:9100"
+    restart: always
+    volumes:
+      - ./config.yml:/app/config.yml

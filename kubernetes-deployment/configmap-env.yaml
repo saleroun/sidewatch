@@ -1,0 +1,56 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: sidewatch-env
+data:
+  config.yml: |
+    # edit this file and add your database address
+    metrics:
+      sidecar_http_haelth_github:
+        description: "network http github"
+        labels: ["container", "http"]
+        type: "gauge"
+        timeout: 5
+        url: "https://github.com"
+
+      sidecar_http_health_example:
+        description: "http health check example.com"
+        labels: ["container", "http"]
+        type: "gauge"
+        timeout: 5
+        url: "https://example.com"
+
+      sidecar_http_health_kucoin:
+        description: "http health check kucoin.com"
+        labels: ["container", "http"]
+        type: "gauge"
+        timeout: 5
+        url: "https://kucoin.com"
+      
+      sidecar_ampq_health_rabbitmq:
+        description: "health check rabbitmq"
+        labels: ["container", "amqp"]
+        type: "gauge"
+        timeout: 5 # timeout is not active option for rabbitmq
+        url: "amqp://user:pass@rabbitmq-operator.database.svc:5672"
+
+      sidecar_mongo_health_mongodb:
+        description: "health check mongodb"
+        labels: ["container", "mongo"]
+        type: "gauge"
+        timeout: 5
+        url: "mongodb://root:password@mongodb-headless.<namespace>.svc.cluster.local:27017"
+
+      sidecar_redis_health_redis:
+        description: "health check redis"
+        labels: ["container", "redis"]
+        type: "gauge"
+        timeout: 5
+        url: "redis://user:pass@redis-headless.database:6379"
+
+      sidecar_taosSql_health_tdengine:
+        description: "health check tdengine"
+        labels: ["container", "taos"]
+        type: "gauge"
+        timeout: 5
+        url: "root:taosdata@http(tdengine.namespace.svc:6041)/database"

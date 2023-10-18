@@ -1,0 +1,98 @@
+#kubectl create secret generic sidewatch-env --from-env-file=.env-prod
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: sidewatch
+  labels:
+    app: sidewatch
+    tier: metrics 
+spec:
+  # replicas: 1
+  selector:
+    matchLabels:
+      app: sidewatch
+      # tier: metrics
+  template:
+    metadata:
+      labels:
+        app: sidewatch
+        tier: metrics
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "9100"
+    spec:
+      imagePullSecrets:
+      - name: regcrednew
+      containers:
+      - name: sidewatch
+        image: <>
+        securityContext:
+          runAsUser: 0
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 9100
+          protocol: TCP
+        resources:
+          requests:
+            memory: 40Mi
+            cpu: "40m"
+          limits:
+            memory: 60Mi
+            cpu: "60m"
+        volumeMounts:
+        - name: env
+          mountPath: /app/config.yml
+          subPath: config.yml
+        env:
+        - name: NODE_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: spec.nodeName
+      volumes:
+      - name: env
+        configMap:
+          name: sidewatch-env
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: sidewatch
+  labels:
+    app: sidewatch
+    tier: metrics
+  # annotations:
+  #   prometheus.io/port: "9100"
+  #   prometheus.io/scrape: "true"
+spec:
+  selector:
+    app: sidewatch
+    tier: metrics
+  ports:
+  - name: metrics
+    protocol: TCP
+    port: 9100
+    targetPort: 9100
+  # type: ClusterIP
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: sidewatch-monitoring
+  labels:
+    # release: monitoring
+    prometheus: devops # should add this line to discover by prometheus
+spec:
+  selector:
+    matchLabels:
+      app: sidewatch
+  jobLabel: sidewatch
+  endpoints:
+  - interval: 5s
+    # targetPort: 9100
+    path: /metrics
+    port: metrics
+  namespaceSelector:
+    matchNames:
+    - sidewatch
+  targetLabels:
+    - app
