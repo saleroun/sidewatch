@@ -1,4 +1,4 @@
-# Go Light Exporter
+# SideWatch (Go Light Exporter)
 This GitHub repository contains an application that monitors various services within a cluster and sends their metrics to Prometheus. The application is designed to check the availability and health of Redis, MongoDB, TDengine, RabbitMQ, and HTTP URLs, and collect metrics for monitoring and alerting purposes.
 #### requirments: 
 
